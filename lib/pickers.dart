@@ -27,9 +27,9 @@ class Pickers {
       SingleCallback? onChanged,
       SingleCallback? onConfirm,
       Function(bool isCancel)? onCancel,
+      bool confirmAutoBack = true,
       bool overlapTabBar = false}) {
-    assert((data is List) || (data is PickerDataType),
-        'params : data must List or PickerDataType');
+    assert((data is List) || (data is PickerDataType), 'params : data must List or PickerDataType');
 
     if (pickerStyle == null) {
       pickerStyle = DefaultPickerStyle();
@@ -45,6 +45,7 @@ class Pickers {
       pickerStyle: pickerStyle,
       onChanged: onChanged,
       onConfirm: onConfirm,
+      confirmAutoBack: confirmAutoBack,
       onCancel: onCancel,
       // theme: Theme.of(context, shadowThemeOnly: true),
       theme: Theme.of(context),
@@ -61,6 +62,7 @@ class Pickers {
       PickerStyle? pickerStyle,
       MultipleCallback? onChanged,
       MultipleCallback? onConfirm,
+      bool confirmAutoBack = true,
       Function(bool isCancel)? onCancel,
       bool overlapTabBar = false}) {
     if (selectData == null) {
@@ -74,14 +76,14 @@ class Pickers {
       pickerStyle.context = context;
     }
 
-    Navigator.of(context, rootNavigator: overlapTabBar)
-        .push(MultiplePickerRoute(
+    Navigator.of(context, rootNavigator: overlapTabBar).push(MultiplePickerRoute(
       data: data,
       selectData: selectData,
       suffix: suffix,
       pickerStyle: pickerStyle,
       onChanged: onChanged,
       onConfirm: onConfirm,
+      confirmAutoBack: confirmAutoBack,
       onCancel: onCancel,
       // theme: Theme.of(context, shadowThemeOnly: true),
       theme: Theme.of(context),
@@ -100,6 +102,7 @@ class Pickers {
       PickerStyle? pickerStyle,
       MultipleLinkCallback? onChanged,
       MultipleLinkCallback? onConfirm,
+      bool confirmAutoBack = true,
       Function(bool isCancel)? onCancel,
       bool overlapTabBar = false}) {
     assert(data is Map, 'params : data must Map');
@@ -115,8 +118,7 @@ class Pickers {
       pickerStyle.context = context;
     }
 
-    Navigator.of(context, rootNavigator: overlapTabBar)
-        .push(MultipleLinkPickerRoute(
+    Navigator.of(context, rootNavigator: overlapTabBar).push(MultipleLinkPickerRoute(
       data: data,
       selectData: selectData,
       columeNum: columeNum,
@@ -124,6 +126,7 @@ class Pickers {
       pickerStyle: pickerStyle,
       onChanged: onChanged,
       onConfirm: onConfirm,
+      confirmAutoBack: confirmAutoBack,
       onCancel: onCancel,
       // theme: Theme.of(context, shadowThemeOnly: true),
       theme: Theme.of(context),
@@ -146,6 +149,7 @@ class Pickers {
       bool addAllItem: true,
       AddressCallback? onChanged,
       AddressCallback? onConfirm,
+      bool confirmAutoBack = true,
       Function(bool isCancel)? onCancel,
       bool overlapTabBar = false}) {
     if (pickerStyle == null) {
@@ -162,6 +166,7 @@ class Pickers {
       initTown: initTown,
       onChanged: onChanged,
       onConfirm: onConfirm,
+      confirmAutoBack: confirmAutoBack,
       onCancel: onCancel,
       addAllItem: addAllItem,
       theme: Theme.of(context),
@@ -188,6 +193,7 @@ class Pickers {
       PickerStyle? pickerStyle,
       DateCallback? onChanged,
       DateCallback? onConfirm,
+      bool confirmAutoBack = true,
       Function(bool isCancel)? onCancel,
       bool overlapTabBar = false}) {
     if (pickerStyle == null) {
@@ -232,6 +238,7 @@ class Pickers {
       pickerStyle: pickerStyle,
       onChanged: onChanged,
       onConfirm: onConfirm,
+      confirmAutoBack: confirmAutoBack,
       onCancel: onCancel,
       // theme: Theme.of(context, shadowThemeOnly: true),
       theme: Theme.of(context),

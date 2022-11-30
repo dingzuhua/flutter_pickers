@@ -12,6 +12,7 @@ class SinglePickerRoute<T> extends PopupRoute<T> {
     this.suffix,
     this.onChanged,
     this.onConfirm,
+    this.confirmAutoBack = true,
     this.onCancel,
     required this.theme,
     this.barrierLabel,
@@ -23,6 +24,7 @@ class SinglePickerRoute<T> extends PopupRoute<T> {
   final dynamic data;
   final SingleCallback? onChanged;
   final SingleCallback? onConfirm;
+  final bool confirmAutoBack;
   final Function(bool isCancel)? onCancel;
   final ThemeData theme;
 
@@ -57,14 +59,12 @@ class SinglePickerRoute<T> extends PopupRoute<T> {
 
   @override
   AnimationController createAnimationController() {
-    _animationController =
-        BottomSheet.createAnimationController(navigator!.overlay!);
+    _animationController = BottomSheet.createAnimationController(navigator!.overlay!);
     return _animationController;
   }
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
     List mData = [];
     // 初始化数据
     if (data is PickerDataType) {
@@ -104,8 +104,7 @@ class _PickerContentView extends StatefulWidget {
   final PickerStyle pickerStyle;
 
   @override
-  State<StatefulWidget> createState() =>
-      _PickerState(this.data, this.selectData, this.pickerStyle);
+  State<StatefulWidget> createState() => _PickerState(this.data, this.selectData, this.pickerStyle);
 }
 
 class _PickerState extends State<_PickerContentView> {
@@ -141,8 +140,7 @@ class _PickerState extends State<_PickerContentView> {
         builder: (BuildContext context, Widget? child) {
           return ClipRect(
             child: CustomSingleChildLayout(
-              delegate: _BottomPickerLayout(widget.route.animation!.value,
-                  pickerStyle: _pickerStyle),
+              delegate: _BottomPickerLayout(widget.route.animation!.value, pickerStyle: _pickerStyle),
               child: GestureDetector(
                 child: Material(
                   color: Colors.transparent,
@@ -158,8 +156,7 @@ class _PickerState extends State<_PickerContentView> {
 
   _init() {
     int pindex = 0;
-    pindex = _data
-        .indexWhere((element) => element.toString() == _selectData.toString());
+    pindex = _data.indexWhere((element) => element.toString() == _selectData.toString());
     // 如果没有匹配到选择器对应数据，我们得修改选择器选中数据 ，不然confirm 返回的事设置的数据
     if (pindex < 0) {
       _selectData = _data[0];
@@ -250,13 +247,7 @@ class _PickerState extends State<_PickerContentView> {
       childCount: _data.length,
       itemBuilder: (_, index) {
         String text = _data[index].toString();
-        return Align(
-            alignment: Alignment.center,
-            child: Text(text,
-                style: TextStyle(
-                    color: _pickerStyle.textColor,
-                    fontSize: _pickerFontSize(text)),
-                textAlign: TextAlign.start));
+        return Align(alignment: Alignment.center, child: Text(text, style: TextStyle(color: _pickerStyle.textColor, fontSize: _pickerFontSize(text)), textAlign: TextAlign.start));
       },
     );
 
@@ -267,11 +258,7 @@ class _PickerState extends State<_PickerContentView> {
           child: AnimatedPadding(
         duration: Duration(milliseconds: 100),
         padding: EdgeInsets.only(left: _laberLeft),
-        child: Text(widget.route.suffix!,
-            style: TextStyle(
-                color: _pickerStyle.textColor,
-                fontSize: 20,
-                fontWeight: FontWeight.w500)),
+        child: Text(widget.route.suffix!, style: TextStyle(color: _pickerStyle.textColor, fontSize: 20, fontWeight: FontWeight.w500)),
       ));
 
       view = Stack(children: [cPicker, laberView]);
@@ -297,9 +284,7 @@ class _PickerState extends State<_PickerContentView> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           /// 取消按钮
-          InkWell(
-              onTap: () => Navigator.pop(context, false),
-              child: _pickerStyle.cancelButton),
+          InkWell(onTap: () => Navigator.pop(context, false), child: _pickerStyle.cancelButton),
 
           /// 标题
           Expanded(child: _pickerStyle.title),
@@ -308,10 +293,12 @@ class _PickerState extends State<_PickerContentView> {
           InkWell(
               onTap: () {
                 if (widget.route.onConfirm != null) {
-                  print('longer   _selectPosition >>> ${_selectPosition}');
+                  print('longer   _selectPosition >>> $_selectPosition');
                   widget.route.onConfirm!(_selectData, _selectPosition);
                 }
-                Navigator.pop(context, true);
+                if (widget.route.confirmAutoBack) {
+                  Navigator.pop(context, true);
+                }
               },
               child: _pickerStyle.commitButton)
         ],
@@ -336,11 +323,7 @@ class _BottomPickerLayout extends SingleChildLayoutDelegate {
       maxHeight += pickerStyle.menuHeight;
     }
 
-    return BoxConstraints(
-        minWidth: constraints.maxWidth,
-        maxWidth: constraints.maxWidth,
-        minHeight: 0.0,
-        maxHeight: maxHeight);
+    return BoxConstraints(minWidth: constraints.maxWidth, maxWidth: constraints.maxWidth, minHeight: 0.0, maxHeight: maxHeight);
   }
 
   @override

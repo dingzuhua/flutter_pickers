@@ -22,6 +22,7 @@ class AddressPickerRoute<T> extends PopupRoute<T> {
     this.initTown,
     this.onChanged,
     this.onConfirm,
+    this.confirmAutoBack = true,
     this.onCancel,
     this.theme,
     this.barrierLabel,
@@ -32,6 +33,7 @@ class AddressPickerRoute<T> extends PopupRoute<T> {
   final String? initTown;
   final AddressCallback? onChanged;
   final AddressCallback? onConfirm;
+  final bool confirmAutoBack;
   final Function(bool isCancel)? onCancel;
   final ThemeData? theme;
   final bool addAllItem;
@@ -67,14 +69,12 @@ class AddressPickerRoute<T> extends PopupRoute<T> {
   @override
   AnimationController createAnimationController() {
     assert(_animationController == null);
-    _animationController =
-        BottomSheet.createAnimationController(navigator!.overlay!);
+    _animationController = BottomSheet.createAnimationController(navigator!.overlay!);
     return _animationController!;
   }
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
     Widget bottomSheet = MediaQuery.removePadding(
       context: context,
       removeTop: true,
@@ -113,8 +113,7 @@ class _PickerContentView extends StatefulWidget {
   final PickerStyle pickerStyle;
 
   @override
-  State<StatefulWidget> createState() => _PickerState(this.initProvince,
-      this.initCity, this.initTown, this.addAllItem, this.pickerStyle);
+  State<StatefulWidget> createState() => _PickerState(this.initProvince, this.initCity, this.initTown, this.addAllItem, this.pickerStyle);
 }
 
 class _PickerState extends State<_PickerContentView> {
@@ -134,12 +133,9 @@ class _PickerState extends State<_PickerContentView> {
   AnimationController? controller;
   Animation<double>? animation;
 
-  late FixedExtentScrollController provinceScrollCtrl,
-      cityScrollCtrl,
-      townScrollCtrl;
+  late FixedExtentScrollController provinceScrollCtrl, cityScrollCtrl, townScrollCtrl;
 
-  _PickerState(this._currentProvince, this._currentCity, this._currentTown,
-      this.addAllItem, this._pickerStyle) {
+  _PickerState(this._currentProvince, this._currentCity, this._currentTown, this.addAllItem, this._pickerStyle) {
     provinces = Address.provinces;
     hasTown = this._currentTown != null;
 
@@ -163,8 +159,7 @@ class _PickerState extends State<_PickerContentView> {
         builder: (BuildContext context, Widget? child) {
           return ClipRect(
             child: CustomSingleChildLayout(
-              delegate: _BottomPickerLayout(
-                  widget.route.animation!.value, this._pickerStyle),
+              delegate: _BottomPickerLayout(widget.route.animation!.value, this._pickerStyle),
               child: GestureDetector(
                 child: Material(
                   color: Colors.transparent,
@@ -321,12 +316,7 @@ class _PickerState extends State<_PickerContentView> {
                 itemBuilder: (_, index) {
                   String text = Address.provinces[index];
                   return Align(
-                      alignment: Alignment.center,
-                      child: Text(text,
-                          style: TextStyle(
-                              color: _pickerStyle.textColor,
-                              fontSize: _pickerFontSize(text)),
-                          textAlign: TextAlign.start));
+                      alignment: Alignment.center, child: Text(text, style: TextStyle(color: _pickerStyle.textColor, fontSize: _pickerFontSize(text)), textAlign: TextAlign.start));
                 },
               ),
             ),
@@ -346,11 +336,7 @@ class _PickerState extends State<_PickerContentView> {
                     String text = cities[index]['name'];
                     return Align(
                       alignment: Alignment.center,
-                      child: Text('$text',
-                          style: TextStyle(
-                              color: _pickerStyle.textColor,
-                              fontSize: _pickerFontSize(text)),
-                          textAlign: TextAlign.start),
+                      child: Text('$text', style: TextStyle(color: _pickerStyle.textColor, fontSize: _pickerFontSize(text)), textAlign: TextAlign.start),
                     );
                   },
                 )),
@@ -371,11 +357,7 @@ class _PickerState extends State<_PickerContentView> {
                           String text = towns[index];
                           return Align(
                             alignment: Alignment.center,
-                            child: Text(text,
-                                style: TextStyle(
-                                    color: _pickerStyle.textColor,
-                                    fontSize: _pickerFontSize(text)),
-                                textAlign: TextAlign.start),
+                            child: Text(text, style: TextStyle(color: _pickerStyle.textColor, fontSize: _pickerFontSize(text)), textAlign: TextAlign.start),
                           );
                         },
                       )),
@@ -396,9 +378,7 @@ class _PickerState extends State<_PickerContentView> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           /// 取消按钮
-          InkWell(
-              onTap: () => Navigator.pop(context, false),
-              child: _pickerStyle.cancelButton),
+          InkWell(onTap: () => Navigator.pop(context, false), child: _pickerStyle.cancelButton),
 
           /// 标题
           Expanded(child: _pickerStyle.title),
@@ -407,10 +387,11 @@ class _PickerState extends State<_PickerContentView> {
           InkWell(
               onTap: () {
                 if (widget.route.onConfirm != null) {
-                  widget.route.onConfirm!(
-                      _currentProvince, _currentCity, _currentTown);
+                  widget.route.onConfirm!(_currentProvince, _currentCity, _currentTown);
                 }
-                Navigator.pop(context, true);
+                if (widget.route.confirmAutoBack) {
+                  Navigator.pop(context, true);
+                }
               },
               child: _pickerStyle.commitButton)
         ],
@@ -435,11 +416,7 @@ class _BottomPickerLayout extends SingleChildLayoutDelegate {
       maxHeight += pickerStyle.menuHeight;
     }
 
-    return BoxConstraints(
-        minWidth: constraints.maxWidth,
-        maxWidth: constraints.maxWidth,
-        minHeight: 0.0,
-        maxHeight: maxHeight);
+    return BoxConstraints(minWidth: constraints.maxWidth, maxWidth: constraints.maxWidth, minHeight: 0.0, maxHeight: maxHeight);
   }
 
   @override

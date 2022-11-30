@@ -17,6 +17,7 @@ class MultipleLinkPickerRoute<T> extends PopupRoute<T> {
     this.suffix,
     this.onChanged,
     this.onConfirm,
+    this.confirmAutoBack = true,
     this.onCancel,
     this.theme,
     this.barrierLabel,
@@ -29,6 +30,7 @@ class MultipleLinkPickerRoute<T> extends PopupRoute<T> {
   final List? suffix;
   final MultipleLinkCallback? onChanged;
   final MultipleLinkCallback? onConfirm;
+  final bool confirmAutoBack;
   final Function(bool isCancel)? onCancel;
   final ThemeData? theme;
 
@@ -62,14 +64,12 @@ class MultipleLinkPickerRoute<T> extends PopupRoute<T> {
 
   @override
   AnimationController createAnimationController() {
-    _animationController =
-        BottomSheet.createAnimationController(navigator!.overlay!);
+    _animationController = BottomSheet.createAnimationController(navigator!.overlay!);
     return _animationController;
   }
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
     Widget bottomSheet = MediaQuery.removePadding(
       context: context,
       removeTop: true,
@@ -106,8 +106,7 @@ class _PickerContentView extends StatefulWidget {
   final PickerStyle pickerStyle;
 
   @override
-  State<StatefulWidget> createState() => _PickerState(
-      this.data, this.selectData, this.pickerStyle, this.columeNum);
+  State<StatefulWidget> createState() => _PickerState(this.data, this.selectData, this.pickerStyle, this.columeNum);
 }
 
 class _PickerState extends State<_PickerContentView> {
@@ -139,8 +138,7 @@ class _PickerState extends State<_PickerContentView> {
   // 选择器 高度  单独提出来，用来解决修改数据 不及时更新的BUG
   late double pickerItemHeight;
 
-  _PickerState(
-      this._data, List mSelectData, this._pickerStyle, this._columeNum) {
+  _PickerState(this._data, List mSelectData, this._pickerStyle, this._columeNum) {
     this.pickerItemHeight = _pickerStyle.pickerItemHeight;
     // 已选择器数据为准，因为初始化数据有可能和选择器对不上
     this._selectData = [];
@@ -173,8 +171,7 @@ class _PickerState extends State<_PickerContentView> {
         builder: (BuildContext context, Widget? child) {
           return ClipRect(
             child: CustomSingleChildLayout(
-              delegate: _BottomPickerLayout(widget.route.animation!.value,
-                  pickerStyle: _pickerStyle),
+              delegate: _BottomPickerLayout(widget.route.animation!.value, pickerStyle: _pickerStyle),
               child: GestureDetector(
                 child: Material(
                   color: Colors.transparent,
@@ -258,8 +255,7 @@ class _PickerState extends State<_PickerContentView> {
     if (position < _columeNum - 1) {
       // 先更新下一列所有数据
       // 如果这一列的所有数据都为空，下列直接也设为空数据(优化)
-      if (_columnData[position].length == 1 &&
-          _columnData[position].first == placeData) {
+      if (_columnData[position].length == 1 && _columnData[position].first == placeData) {
         _columnData[position + 1] = [placeData];
       } else {
         _columnData[position + 1] = findColumeData(position + 1);
@@ -351,8 +347,7 @@ class _PickerState extends State<_PickerContentView> {
   void _notifyLocationChanged() {
     setState(() {
       /// FIX:https://github.com/flutter/flutter/issues/22999
-      pickerItemHeight =
-          _pickerStyle.pickerItemHeight - Random().nextDouble() / 100000000;
+      pickerItemHeight = _pickerStyle.pickerItemHeight - Random().nextDouble() / 100000000;
     });
     if (widget.route.onChanged != null) {
       widget.route.onChanged!(_selectData, _selectDataPosition);
@@ -379,8 +374,7 @@ class _PickerState extends State<_PickerContentView> {
 
   Widget _renderItemView() {
     // 选择器
-    List<Widget> pickerList =
-        List.generate(_columeNum, (index) => pickerView(index)).toList();
+    List<Widget> pickerList = List.generate(_columeNum, (index) => pickerView(index)).toList();
 
     return Container(
       height: _pickerStyle.pickerHeight,
@@ -404,18 +398,12 @@ class _PickerState extends State<_PickerContentView> {
           itemBuilder: (_, index) {
             // String text = _data[position][index].toString();
             String suffix = '';
-            if (widget.route.suffix != null &&
-                position < widget.route.suffix!.length) {
+            if (widget.route.suffix != null && position < widget.route.suffix!.length) {
               suffix = widget.route.suffix![position];
             }
 
             String text = '${_columnData[position][index]}$suffix';
-            return Align(
-                alignment: Alignment.center,
-                child: Text(text,
-                    style: TextStyle(
-                        color: _pickerStyle.textColor, fontSize: 18.0),
-                    textAlign: TextAlign.start));
+            return Align(alignment: Alignment.center, child: Text(text, style: TextStyle(color: _pickerStyle.textColor, fontSize: 18.0), textAlign: TextAlign.start));
           },
         ),
       ),
@@ -432,9 +420,7 @@ class _PickerState extends State<_PickerContentView> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           /// 取消按钮
-          InkWell(
-              onTap: () => Navigator.pop(context, false),
-              child: _pickerStyle.cancelButton),
+          InkWell(onTap: () => Navigator.pop(context, false), child: _pickerStyle.cancelButton),
 
           /// 标题
           Expanded(child: _pickerStyle.title),
@@ -445,7 +431,9 @@ class _PickerState extends State<_PickerContentView> {
                 if (widget.route.onConfirm != null) {
                   widget.route.onConfirm!(_selectData, _selectDataPosition);
                 }
-                Navigator.pop(context, true);
+                if (widget.route.confirmAutoBack) {
+                  Navigator.pop(context, true);
+                }
               },
               child: _pickerStyle.commitButton)
         ],
@@ -470,11 +458,7 @@ class _BottomPickerLayout extends SingleChildLayoutDelegate {
       maxHeight += pickerStyle.menuHeight;
     }
 
-    return BoxConstraints(
-        minWidth: constraints.maxWidth,
-        maxWidth: constraints.maxWidth,
-        minHeight: 0.0,
-        maxHeight: maxHeight);
+    return BoxConstraints(minWidth: constraints.maxWidth, maxWidth: constraints.maxWidth, minHeight: 0.0, maxHeight: maxHeight);
   }
 
   @override

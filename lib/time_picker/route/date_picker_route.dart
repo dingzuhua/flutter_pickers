@@ -666,6 +666,9 @@ class _PickerState extends State<_PickerContentView> {
   }
 
   double _pickerFontSize(String text) {
+    if (this._pickerStyle.textSize != null) {
+      return this._pickerStyle.textSize! * 1.0;
+    }
     if (text == '') return 18.0;
 
     if (_dateItemModel.length == 6 && (text.length > 4 && text.length <= 6)) {

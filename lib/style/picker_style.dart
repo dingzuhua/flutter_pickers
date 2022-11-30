@@ -31,6 +31,7 @@ class PickerStyle {
   Color? _backgroundColor;
   Color? _textColor;
   Widget? _itemOverlay;
+  int? _textSize;
 
   PickerStyle({
     BuildContext? context,
@@ -47,6 +48,7 @@ class PickerStyle {
     Color? backgroundColor,
     Color? textColor,
     Widget? itemOverlay,
+    int? textSize,
   }) {
     this._context = context;
     this._showTitleBar = showTitleBar;
@@ -64,6 +66,7 @@ class PickerStyle {
     this._backgroundColor = backgroundColor;
     this._textColor = textColor;
     this._itemOverlay = itemOverlay;
+    this._textSize = textSize;
   }
 
   set context(BuildContext? value) {
@@ -127,8 +130,7 @@ class PickerStyle {
   /// 选择器背景色 默认白色
   Color get backgroundColor => this._backgroundColor ?? Colors.white;
 
-  Decoration get headDecoration =>
-      this._headDecoration ?? BoxDecoration(color: Colors.white);
+  Decoration get headDecoration => this._headDecoration ?? BoxDecoration(color: Colors.white);
 
   Widget? get menu => this._menu;
 
@@ -152,14 +154,14 @@ class PickerStyle {
 
   Widget? get itemOverlay => this._itemOverlay;
 
+  int? get textSize => this._textSize;
+
   Widget getCommitButton() {
     return this._commitButton ??
         Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.only(left: 12, right: 22),
-          child: Text('确定',
-              style: TextStyle(
-                  color: Theme.of(context!).primaryColor, fontSize: 16.0)),
+          child: Text('确定', style: TextStyle(color: Theme.of(context!).primaryColor, fontSize: 16.0)),
         );
   }
 
@@ -168,10 +170,7 @@ class PickerStyle {
         Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.only(left: 22, right: 12),
-          child: Text('取消',
-              style: TextStyle(
-                  color: Theme.of(context!).unselectedWidgetColor,
-                  fontSize: 16.0)),
+          child: Text('取消', style: TextStyle(color: Theme.of(context!).unselectedWidgetColor, fontSize: 16.0)),
         );
   }
 }

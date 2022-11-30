@@ -197,6 +197,9 @@ class _PickerState extends State<_PickerContentView> {
   }
 
   double _pickerFontSize(String text) {
+    if (this._pickerStyle.textSize != null) {
+      return this._pickerStyle.textSize! * 1.0;
+    }
     if (text.length <= 6) {
       return 18.0;
     } else if (text.length < 9) {
